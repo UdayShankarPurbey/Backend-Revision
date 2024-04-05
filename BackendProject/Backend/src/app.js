@@ -14,4 +14,11 @@ app.use(expres.urlencoded({extended : true , limit : '50kb'}))
 app.use(expres.static("public"))
 app.use(cookieParser())
 
+//routes 
+
+import userRouter from './routes/user.routes.js'
+
+//routes declaration
+app.use("/api/v1/users", userRouter);
+
 export {app}
