@@ -1,0 +1,16 @@
+<!-- {{apiResponse | json}} -->
+
+<table border="1" >
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Joke</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let joke of apiResponse">
+            <td>{{joke.id}}</td>
+            <td>{{joke.joke}}</td>
+        </tr>
+    </tbody>
+</table>
