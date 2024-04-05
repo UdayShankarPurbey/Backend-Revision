@@ -1,6 +1,4 @@
 import express from 'express';
-
-import mongoose from 'mongoose';
 import { connectDatabase } from './db/db.js';
 
 import dotenv from 'dotenv';
@@ -12,7 +10,14 @@ dotenv.config({
 const app = express();
 
 connectDatabase()
-
+.then(
+    () => {
+        app.listen(process.env.PORT || 3000 , () => {
+            console.log(`Twityou server listening on port ${process.env.PORT || 3000}`);
+        });
+    }
+)
+.catch(err => console.error("Mongo db Connection Failed",err));
 
 /*
 import mongoose from 'mongoose';
