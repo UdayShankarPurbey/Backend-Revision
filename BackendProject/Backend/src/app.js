@@ -17,10 +17,6 @@ app.use(cookieParser())
 //routes 
 
 import userRouter from './routes/user.routes.js'
-
-//routes declaration
-app.use("/api/v1/users", userRouter);
-
 import healthcheckRouter from "./routes/healthcheck.routes.js"
 import tweetRouter from "./routes/tweet.routes.js"
 import subscriptionRouter from "./routes/subscription.routes.js"
