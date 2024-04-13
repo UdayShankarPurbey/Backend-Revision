@@ -4,60 +4,94 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
-//tryit : do something like like and dislike and implement toggle in it.
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params
-    //TODO: toggle like on video
 
-    const like = await Like.create(
+    const toggleLike = await Like.find(
         {
-            LikedBy : req.user?._id,
-            video : videoId,
+            $and : [{LikedBy : req.user?._id},{video : videoId}]
         }
     )
+    let message;
+    let like;
+    if(toggleLike.length > 0) {
+        like = await Like.findByIdAndDelete(toggleLike[0]._id) 
+        message = "Liked Video deleted successfully"
+    } else{
+        like = await Like.create(
+            {
+                LikedBy : req.user?._id,
+                video : videoId,
+            }
+        )
+        message = " Liked Video created successfully"
+    }     
 
     return res.status(200).json(
-        new ApiResponse ( 200 , like , " Liked Video created successfully")
+        new ApiResponse ( 200 , like , message)
     )
 })
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params
-    //TODO: toggle like on comment
-
-    const like = await Like.create(
+   
+    const toggleComment = await Like.find(
         {
-            LikedBy : req.user?._id ,
-            comment : commentId,
+            $and : [{LikedBy : req.user?._id},{comment : commentId}]
         }
     )
+    let message;
+    let comment;
+    if(toggleComment.length > 0) {
+        comment = await Like.findByIdAndDelete(toggleComment[0]._id) 
+        message = "Liked Comment deleted successfully"
+    } else{
+        comment = await Like.create(
+            {
+                LikedBy : req.user?._id ,
+                comment : commentId,
+            }
+        )
+        message = " Liked Comment created successfully"
+    }     
 
     return res.status(200).json(
-        new ApiResponse ( 200 , like , " Comment Liked successfully")
+        new ApiResponse ( 200 , comment , message)
     )
 })
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
-    //TODO: toggle like on tweet
-
-    const like = await Like.create(
+    const toggleTweet = await Like.find(
         {
-            LikedBy : req.user?._id ,
-            tweet : tweetId,
+            $and : [{LikedBy : req.user?._id},{tweet : tweetId}]
         }
     )
+    let message;
+    let tweet;
+    if(toggleTweet.length > 0) {
+        tweet = await Like.findByIdAndDelete(toggleTweet[0]._id) 
+        message = "Liked Comment deleted successfully"
+    } else{
+        tweet = await Like.create(
+            {
+                LikedBy : req.user?._id ,
+                tweet : tweetId,
+            }
+        )
+        message = " Liked Comment created successfully"
+    }     
 
     return res.status(200).json(
-        new ApiResponse ( 200 , like , " Tweet Liked successfully")
+        new ApiResponse ( 200 , tweet , message)
     )
 })
 
 const getLikedVideos = asyncHandler(async (req, res) => {
-    //TODO: get all liked videos
 
-    const like = await Like.find({owner : req.user?._id})
+    const like = await Like.find({LikedBy : req.user?._id, video: { $ne: null }})
+    // const like = await Like.find({LikedBy : req.user?._id, video: { $exists: true } })
 
     return res.status(200).json(
         new ApiResponse(200 , like , "Get All Liked Video Succesdfully")
