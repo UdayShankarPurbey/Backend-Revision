@@ -1,0 +1,634 @@
+{
+	"info": {
+		"_postman_id": "732e43a7-2b67-4089-997d-9be85ee5ff76",
+		"name": "Twityou",
+		"description": "Making a video streaming paltform in which integrated message features too.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "32770905"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "password",
+									"value": "Raushantest",
+									"type": "text"
+								},
+								{
+									"key": "fullName",
+									"value": "Raushan Jha",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "Raushan01@test.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "Raushantest",
+									"type": "text"
+								},
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/cover Image/gradient-travel-agency-annual-report-template_23-2149404112.avif"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/avatar/androgynous-avatar-non-binary-queer-person_23-2151100226.avif"
+								}
+							]
+						},
+						"url": "{{server}}/users/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"email\" : \"Abhijeet01@test.com\",\r\n \"username\" : \"Abhijeettest\" , \r\n \"password\" : \"Abhijeettest\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/users/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/users/logout"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh RefreshToken",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/users/refresh-token"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"oldPassword\" : \"shashi\" ,\r\n    \"newPassword\" : \"Raushantest\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/users/change-password"
+					},
+					"response": []
+				},
+				{
+					"name": "Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/users/current-user"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Account Details",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"email\" : \"Raushan01@test.com\" ,\r\n    \"fullName\" : \"Shashikant Mishra\"\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/users/update-account-details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Avatar",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/avatar/3d-illustration-human-avatar-profile_23-2150671142.avif"
+								}
+							]
+						},
+						"url": "{{server}}/users/avatar"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cover Image",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/cover Image/gradient-travel-agency-annual-report-template_23-2149404112.avif"
+								}
+							]
+						},
+						"url": "{{server}}/users/cover-image"
+					},
+					"response": []
+				},
+				{
+					"name": "? Watch History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/users/watch-histroy"
+					},
+					"response": []
+				},
+				{
+					"name": "? Channel Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/users/c/Abhijeettest"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Video",
+			"item": [
+				{
+					"name": "Upload Video",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "videoFile",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/Sample Video/sample-2.mp4"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/Thumbnail/lukas-blazek-EWDvHNNfUmQ-unsplash.jpg"
+								},
+								{
+									"key": "title",
+									"value": "data integrity 7",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "test data 7",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{server}}/videos/"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Video By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/videos/6618d0a184a383b5d4c5bd4b"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Video By Id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "trying to edit ",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Trying to edit Descrption ",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "/C:/Users/Hp/Downloads/Thumbnail/xinyi-w-qjCHPZbeXCQ-unsplash.jpg"
+								}
+							]
+						},
+						"url": "{{server}}/videos/6618d0a184a383b5d4c5bd4b"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Video By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{server}}/videos/6618d07784a383b5d4c5bd48"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Publish Video",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": "{{server}}/videos/toggle/publish/6618cd7d84a383b5d4c5bd2f"
+					},
+					"response": []
+				},
+				{
+					"name": "? Get All Video",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/videos/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tweet",
+			"item": [
+				{
+					"name": "Create Tweet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\" : \"Extreme Passionate\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/tweets/"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Tweet",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/tweets/user/6618c70284a383b5d4c5bce2"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tweet",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\" : \"Updated Tweet 😂😂😂\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/tweets/6618d35d84a383b5d4c5bd99"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tweet",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{server}}/tweets/6618d21384a383b5d4c5bd65"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Playlist",
+			"item": [
+				{
+					"name": "Create Playlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"independence day\",\r\n    \"description\" : \"Independence day in giet \"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/playlist/"
+					},
+					"response": []
+				},
+				{
+					"name": "User Playlist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/playlist/user/6618c7fe84a383b5d4c5bcee"
+					},
+					"response": []
+				},
+				{
+					"name": "Get  Playlist By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/playlist/6618d3e484a383b5d4c5bdb3"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Playlist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"tutu\",\r\n    \"description\" : \"just fun \"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/playlist/6618d3e484a383b5d4c5bdb3"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Playlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{server}}/playlist/6618d3ba84a383b5d4c5bdad"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Video To Playlist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": "{{server}}/playlist/add/6618d44884a383b5d4c5bdbf/6618ce0884a383b5d4c5bd35"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Video From Playlist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": "{{server}}/playlist/remove/6618d44884a383b5d4c5bdbf/6618ce0884a383b5d4c5bd35"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comment",
+			"item": [
+				{
+					"name": "Add Comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\" : \"its Great to have it check \"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/comments/6618d0fa84a383b5d4c5bd4e"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Comment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\" : \"changed Comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{server}}/comments/c/6618e0e684a383b5d4c5bddc"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{server}}/comments/c/6618e19884a383b5d4c5bdf6"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comment of a Video",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/comments/6618cd7d84a383b5d4c5bd2f?page=1&limit=10",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"comments",
+								"6618cd7d84a383b5d4c5bd2f"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Like",
+			"item": [
+				{
+					"name": "Video Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{server}}/likes/toggle/v/6618d16084a383b5d4c5bd51"
+					},
+					"response": []
+				},
+				{
+					"name": "Comment Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{server}}/likes/toggle/c/6618e12784a383b5d4c5bde6"
+					},
+					"response": []
+				},
+				{
+					"name": "Tweet Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{server}}/likes/toggle/t/6618d26584a383b5d4c5bd76"
+					},
+					"response": []
+				},
+				{
+					"name": "Liked Video by User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/likes/videos"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HealthCheck",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/healthcheck/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscription",
+			"item": [
+				{
+					"name": "Subscriber of a Channel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/subscriptions/c/6618c70284a383b5d4c5bce2"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Subscription",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{server}}/subscriptions/c/6618c70284a383b5d4c5bce2"
+					},
+					"response": []
+				},
+				{
+					"name": "Subscribed Channel Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/subscriptions/u/6618c7fe84a383b5d4c5bcee"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Channel Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/dashboard/stats"
+					},
+					"response": []
+				},
+				{
+					"name": "Channel Video",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{server}}/dashboard/videos"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
