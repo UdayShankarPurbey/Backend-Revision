@@ -32,10 +32,10 @@ const registerUser = asyncHandler( async (req ,res) => {
     check for user creation 
     return response
     */
-   const { username , email , fullName , password } = req.body;
+   const { username , email, mobNo , fullName , password } = req.body;
 
    if(
-    [ fullName , email , password , username ].some((fields) => fields?.trim() === "")
+    [ fullName , email , password , username ,mobNo].some((fields) => fields?.trim() === "")
    ) {
     throw new ApiError(400, "Please fill all the fields")
    }
@@ -49,6 +49,7 @@ const registerUser = asyncHandler( async (req ,res) => {
    }
 
    const avatarLocalPath = req.files?.avatar[0]?.path
+   console.log(avatarLocalPath);
 
    let coverImageLocalPath;
    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
@@ -68,6 +69,7 @@ const registerUser = asyncHandler( async (req ,res) => {
 
    const user =await User.create({
     username,
+    mobNo,
     email,
     fullName,
     avatar : avatar?.url,
@@ -102,12 +104,12 @@ const loginUser = asyncHandler( async (req ,res) => {
 
     const { email, username , password } = req.body;
 
-    if(!(username || email)) {
-        throw new ApiError(400, "Please enter a username or email")
+    if(!(username && email)) {
+        throw new ApiError(400, "Please enter a username and email")
     }
     
     const user = await User.findOne({
-        $or : [ {username}, {email}]
+        $and : [ {username}, {email}]
     })
 
     if(!user ) {
