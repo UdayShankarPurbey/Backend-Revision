@@ -49,8 +49,14 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
+    const commentTypeEnum = ['comment', 'video', 'tweet'];
+
     const { content } = req.body;
-    const { videoId } = req.params;
+    const { id , type } = req.params;
+    
+    if (!commentTypeEnum.includes(type)) {
+        throw new ApiError(400 , 'Invalid type. Type is of tweet, video,comment');
+    }
 
     if(! content) {
         throw new ApiError(400, "Please enter a comment")
@@ -58,8 +64,8 @@ const addComment = asyncHandler(async (req, res) => {
 
     const comments = await Comment.create({
        content,
-       video : videoId,
-       owner : req.user?._id
+       owner : req.user?._id,
+       [type]: id // Dynamically add the type field
     })
 
     if( ! comments) {

@@ -14,6 +14,14 @@ const commentSchema = new Schema(
         owner : {
             type : Schema.Types.ObjectId,
             ref : "User"
+        },
+        comment : {
+            type : Schema.Types.ObjectId,
+            ref : "Comment"
+        },
+        tweet : {
+            type : Schema.Types.ObjectId,
+            ref : "Tweet"
         }
     },
     {
