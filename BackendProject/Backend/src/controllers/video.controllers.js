@@ -8,11 +8,69 @@ import {removeFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page, limit, query, sortBy, sortType, userId } = req.query
+    const { query, sortBy, sortType, userId } = req.query
     //TODO: get all videos based on query, sort, pagination
 
+    
     //PENDING: understand and implement query, sortBy, sortType, userId
-    const videos = await Video.find().skip((page - 1)*limit).limit(limit)
+    const page = parseInt(req.query.page) || 1; // Convert page to number
+    const limit = parseInt(req.query.limit) || 10; // Convert limit to number
+
+    let videos ;
+    if(userId) {
+        videos = await Video.aggregate([
+            {
+                $match: {
+                    owner : new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'ownerName'
+              }
+            },
+            {
+              $addFields: {
+                "ownerName": { $arrayElemAt: ["$ownerName.fullName", 0] },
+                "ownerAvatar": { $arrayElemAt: ["$ownerName.avatar", 0] } 
+              }
+            },
+            {
+              $skip: (page - 1) * limit
+            },
+            {
+              $limit: limit
+            }
+          ]);
+    } else {
+        videos = await Video.aggregate([
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'ownerName'
+              }
+            },
+            {
+              $addFields: {
+                "ownerName": { $arrayElemAt: ["$ownerName.fullName", 0] },
+                "ownerAvatar": { $arrayElemAt: ["$ownerName.avatar", 0] } 
+              }
+            },
+            {
+              $skip: (page - 1) * limit
+            },
+            {
+              $limit: limit
+            }
+          ]);
+    }
+    
+    
     return res.status(200).json(
         new ApiResponse(200 ,videos , "Videos Fetched")
     )
@@ -64,7 +122,26 @@ const publishAVideo = asyncHandler(async (req, res) => {
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
-    const video = await Video.findById(videoId)
+    const video = await Video.aggregate([
+        {
+            $match : {
+                _id : new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup: {
+              from: 'users',
+              localField: 'owner',
+              foreignField: '_id',
+              as: 'ownerName'
+            }
+        },
+        {
+            $addFields: {
+              "ownerName": { $arrayElemAt: ["$ownerName.fullName", 0] }
+            }
+        },
+    ])
     if(!video) {
         throw new ApiError(404, "Video not found")
     }
