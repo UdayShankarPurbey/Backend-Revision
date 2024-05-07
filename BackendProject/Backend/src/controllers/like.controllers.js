@@ -71,7 +71,8 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     let message;
     let tweet;
     if(toggleTweet.length > 0) {
-        tweet = await Like.findByIdAndDelete(toggleTweet[0]._id) 
+        await Like.findByIdAndDelete(toggleTweet[0]._id) 
+        tweet = {}
         message = "Liked Comment deleted successfully"
     } else{
         tweet = await Like.create(

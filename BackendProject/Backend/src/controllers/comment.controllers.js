@@ -38,14 +38,21 @@ const getVideoComments = asyncHandler(async (req, res) => {
             },
             {
                 $unwind: "$ownerName" 
-              },
-              {
+            },
+            {
                 $project: {
-                  _id: 0, // Exclude the _id field if desired
+                    
+                  _id: 1, 
+                  content: 1,
+                  video: 1,
+                  owner: 1,
                   ownerName: "$ownerName.fullName",
-                  ownerAvatar: "$ownerName.avatar"
+                  ownerAvatar: "$ownerName.avatar",
+                  createdAt: 1,
+                  updatedAt: 1,
+                  
                 }
-              },
+            },
             {
               $skip: (page - 1) * limit
             },
@@ -56,7 +63,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     )
     
     return res.status(200).json(
-        new ApiResponse(200 ,comment , "Video comments Fetched")
+        new ApiResponse(200 ,comment , `${type.charAt(0).toUpperCase() + type.slice(1)} comments Fetched`)
     )
 })
 
