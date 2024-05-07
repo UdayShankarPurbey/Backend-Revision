@@ -3,10 +3,19 @@ import {Comment} from "../models/comment.modles.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
+import { Tweet } from "../models/tweet.models.js"
+import { Video } from "../models/video.models.js"
+
+const commentTypeEnum = ['comment', 'video', 'tweet'];
+
 
 const getVideoComments = asyncHandler(async (req, res) => {
     //TODO: get all comments for a video
-    const {videoId} = req.params
+    const { id , type } = req.params;
+    
+    if (!commentTypeEnum.includes(type)) {
+        throw new ApiError(400 , 'Invalid type. Type is of tweet, video,comment');
+    }
     // const {page , limit } = req.query
     // const comment = await Comment.find({video : videoId}).skip((page - 1) * limit).limit(limit)
 
@@ -15,9 +24,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const comment = await Comment.aggregate(
         [
             {
-              $match: {
-                video: new mongoose.Types.ObjectId(videoId)
-              }
+                $match: {
+                  [type]: new mongoose.Types.ObjectId(id)
+                }
             },
             {
                 $lookup : {
@@ -28,11 +37,15 @@ const getVideoComments = asyncHandler(async (req, res) => {
                 }
             },
             {
-                $addFields: {
-                  "ownerName": { $arrayElemAt: ["$ownerName.fullName", 0] },
-                  "ownerAvatar": { $arrayElemAt: ["$ownerName.avatar", 0] } 
+                $unwind: "$ownerName" 
+              },
+              {
+                $project: {
+                  _id: 0, // Exclude the _id field if desired
+                  ownerName: "$ownerName.fullName",
+                  ownerAvatar: "$ownerName.avatar"
                 }
-            },
+              },
             {
               $skip: (page - 1) * limit
             },
@@ -49,7 +62,6 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
-    const commentTypeEnum = ['comment', 'video', 'tweet'];
 
     const { content } = req.body;
     const { id , type } = req.params;
@@ -60,6 +72,12 @@ const addComment = asyncHandler(async (req, res) => {
 
     if(! content) {
         throw new ApiError(400, "Please enter a comment")
+    }
+
+    const referencedObject = await mongoose.model(type.charAt(0).toUpperCase() + type.slice(1)).findById(id);
+
+    if (!referencedObject) {
+        throw new ApiError(404, `${type.charAt(0).toUpperCase() + type.slice(1)} does not exist`);
     }
 
     const comments = await Comment.create({
