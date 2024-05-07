@@ -29,9 +29,10 @@ const getVideoComments = asyncHandler(async (req, res) => {
             },
             {
                 $addFields: {
-                  "ownerName": { $arrayElemAt: ["$ownerName.fullName", 0] }
+                  "ownerName": { $arrayElemAt: ["$ownerName.fullName", 0] },
+                  "ownerAvatar": { $arrayElemAt: ["$ownerName.avatar", 0] } 
                 }
-              },
+            },
             {
               $skip: (page - 1) * limit
             },
