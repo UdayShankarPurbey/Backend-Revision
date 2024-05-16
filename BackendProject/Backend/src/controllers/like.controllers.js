@@ -3,6 +3,7 @@ import {Like} from "../models/like.models.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
+import { TypeEnum } from "../utils/TypeEnum.js"
 
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
@@ -89,19 +90,31 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     )
 })
 
-const getLikedVideos = asyncHandler(async (req, res) => {
+const getLikedData= asyncHandler(async (req, res) => {
+    const { type ,id } = req.params;
+    if (!TypeEnum.includes(type)) {
+        throw new ApiError(400 , 'Invalid type. Type is of tweet, video, comment');
+    }
 
-    const like = await Like.find({LikedBy : req.user?._id, video: { $ne: null }})
-    // const like = await Like.find({LikedBy : req.user?._id, video: { $exists: true } })
+    const like = await Like.aggregate(
+        [
+            {
+                $match: {
+                 $and : [{LikedBy : req.user?._id},{[type]: new mongoose.Types.ObjectId(id)}]
+                }
+            }
+          ]
+    )
 
     return res.status(200).json(
-        new ApiResponse(200 , like , "Get All Liked Video Succesdfully")
-    )
+        new ApiResponse(200, like, `Get All Liked ${type.charAt(0).toUpperCase() + type.slice(1)}s Successfully`)
+    );
+
 })
 
 export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
-    getLikedVideos
+    getLikedData
 }

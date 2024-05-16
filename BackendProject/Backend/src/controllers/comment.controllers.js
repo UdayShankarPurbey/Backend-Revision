@@ -5,15 +5,16 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { Tweet } from "../models/tweet.models.js"
 import { Video } from "../models/video.models.js"
+import { TypeEnum } from "../utils/TypeEnum.js"
 
-const commentTypeEnum = ['comment', 'video', 'tweet'];
+// const commentTypeEnum = ['comment', 'video', 'tweet'];
 
 
-const getVideoComments = asyncHandler(async (req, res) => {
+const getAllComments = asyncHandler(async (req, res) => {
     //TODO: get all comments for a video
     const { id , type } = req.params;
     
-    if (!commentTypeEnum.includes(type)) {
+    if (!TypeEnum.includes(type)) {
         throw new ApiError(400 , 'Invalid type. Type is of tweet, video,comment');
     }
     // const {page , limit } = req.query
@@ -46,8 +47,10 @@ const getVideoComments = asyncHandler(async (req, res) => {
                   content: 1,
                   video: 1,
                   owner: 1,
+                  repliedComment : 1,
                   ownerName: "$ownerName.fullName",
                   ownerAvatar: "$ownerName.avatar",
+                  ownerUserName: "$ownerName.username",
                   createdAt: 1,
                   updatedAt: 1,
                   
@@ -60,6 +63,94 @@ const getVideoComments = asyncHandler(async (req, res) => {
               $limit: limit
             }
           ]
+        // [
+        //     {
+        //       $match: {
+        //         comment: new mongoose.Types.ObjectId(id)
+        //       }
+        //     },
+        //     {
+        //       $lookup: {
+        //         from: 'users',
+        //         localField: 'owner',
+        //         foreignField: '_id',
+        //         as: 'result'
+        //       }
+        //     },
+        //     {
+        //       $unwind: {
+        //         path: "$repliedComment",
+        //         preserveNullAndEmptyArrays: true
+        //       }
+        //     },
+        //     {
+        //       $lookup: {
+        //         from: 'users',
+        //         localField: 'repliedComment.commentBy',
+        //         foreignField: '_id',
+        //         as: 'repliedComment.ownerDetails'
+        //       }
+        //     },
+        //     {
+        //       $unwind: {
+        //         path: "$repliedComment.ownerDetails",
+        //         preserveNullAndEmptyArrays: true
+        //       }
+        //     },
+        //     {
+        //       $group: {
+        //         _id: "$_id",
+        //         content: { $first: "$content" },
+        //         owner: { $first: "$owner" },
+        //         comment: { $first: "$comment" },
+        //         createdAt: { $first: "$createdAt" },
+        //         updatedAt: { $first: "$updatedAt" },
+        //         __v: { $first: "$__v" },
+        //         ownerName: { $first: { $arrayElemAt: ["$result.fullName", 0] } },
+        //         ownerAvatar: { $first: { $arrayElemAt: ["$result.avatar", 0] } },
+        //         ownerUserName: { $first: { $arrayElemAt: ["$result.username", 0] } },
+        //         repliedComments: { 
+        //           $push: { 
+        //             _id: "$repliedComment._id",
+        //             commentBy: "$repliedComment.commentBy",
+        //             commentText: "$repliedComment.content",
+        //             createdAt: "$repliedComment.createdAt",
+        //             updatedAt: "$repliedComment.updatedAt",
+        //             ownerDetails: {
+        //               _id: "$repliedComment.ownerDetails._id",
+        //               fullName: "$repliedComment.ownerDetails.fullName",
+        //               avatar: "$repliedComment.ownerDetails.avatar",
+        //               username: "$repliedComment.ownerDetails.username"
+        //             }
+        //           }
+        //         }
+        //       }
+        //     },
+        //     {
+        //       $project: {
+        //         _id: 1,
+        //         content: 1,
+        //         owner: 1,
+        //         comment: 1,
+        //         repliedComment: {
+        //           $cond: { if: { $eq: ["$repliedComments", [{}]] }, then: [], else: "$repliedComments" }
+        //         },
+        //         createdAt: 1,
+        //         updatedAt: 1,
+        //         ownerName: 1,
+        //         ownerAvatar: 1,
+        //         ownerUserName: 1,
+        //         __v: 1
+        //       }
+        //     },
+        //     {
+        //       $skip: (page - 1) * limit
+        //     },
+        //     {
+        //       $limit: limit
+        //     }
+        //   ]
+          
     )
     
     return res.status(200).json(
@@ -73,7 +164,7 @@ const addComment = asyncHandler(async (req, res) => {
     const { content } = req.body;
     const { id , type } = req.params;
     
-    if (!commentTypeEnum.includes(type)) {
+    if (!TypeEnum.includes(type)) {
         throw new ApiError(400 , 'Invalid type. Type is of tweet, video,comment');
     }
 
@@ -137,9 +228,31 @@ const deleteComment = asyncHandler(async (req, res) => {
     .json(new ApiResponse( 200 , {} , "Comment deleted Successfully" ))
 })
 
+const addRepliedComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+    const { content } = req.body;
+
+    const comment = await Comment.findById(commentId);
+
+    if(!comment) {
+        throw new ApiError(404, "Comment not found")
+    }
+
+    comment.repliedComment.push({
+        content : content,
+        commentBy : req.user?._id,
+    });
+
+    await comment.save();
+
+    return res.status(200)
+    .json(new ApiResponse( 200 , comment , "Replied comment Successfully" ))    
+})
+
 export {
-    getVideoComments, 
+    getAllComments, 
     addComment, 
     updateComment,
-     deleteComment
+    deleteComment,
+    addRepliedComment,
     }
