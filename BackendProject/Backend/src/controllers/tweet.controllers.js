@@ -25,16 +25,59 @@ const createTweet = asyncHandler(async (req, res) => {
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
-    // TODO: get user tweets
-
     const { userId } = req.params
 
-    const tweets = await Tweet.find({
-        owner: userId
-    })
+    const tweets = await Tweet.aggregate(
+        [
+            {
+              $match: {
+                owner : new mongoose.Types.ObjectId(userId),
+              }
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'result'
+              }
+            },
+            {
+              $addFields: {
+                 ownerName : {
+                  $first : '$result.fullName'
+                 },
+                ownerUsername : {
+                  $first : '$result.username'
+                },
+                ownerAvatar : {
+                  $first : '$result.avatar'
+                },
+                ownerEmail : {
+                    $first : '$result.email'
+                }
+              }
+            },
+            {
+              $project: {
+                _id : 1,
+                content : 1,
+                createdAt : 1,
+                updatedAt : 1,
+                owner : 1,
+                __v : 1,
+                ownerName : 1,
+                ownerUsername : 1,
+                ownerAvatar : 1,
+                ownerEmail : 1,
+              }
+            }
+          ]
+    )
+  
 
     return res.status(200).json(
-        new ApiResponse(200, tweets, "Tweets Retrieved Successfully")
+        new ApiResponse(200, tweets, "User Tweets Retrieved Successfully")
     )
 })
 
@@ -71,9 +114,56 @@ const deleteTweet = asyncHandler(async (req, res) => {
     )
 })
 
+const getAllTweet = asyncHandler(async (req, res) => {
+
+    const tweets = await Tweet.aggregate(
+        [
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'result'
+              }
+            },
+            {
+              $addFields: {
+                 ownerName : {
+                  $first : '$result.fullName'
+                 },
+                ownerUsername : {
+                  $first : '$result.username'
+                },
+                ownerAvatar : {
+                  $first : '$result.avatar'
+                },
+              }
+            },
+            {
+              $project: {
+                _id : 1,
+                content : 1,
+                createdAt : 1,
+                updatedAt : 1,
+                owner : 1,
+                __v : 1,
+                ownerName : 1,
+                ownerUsername : 1,
+                ownerAvatar : 1,
+              }
+            }
+          ]
+    )
+
+    return res.status(200).json(
+        new ApiResponse(200, tweets, " All Tweets Retrieved Successfully")
+    )
+})
+
 export {
     createTweet,
     getUserTweets,
     updateTweet,
-    deleteTweet
+    deleteTweet,
+    getAllTweet,
 }
