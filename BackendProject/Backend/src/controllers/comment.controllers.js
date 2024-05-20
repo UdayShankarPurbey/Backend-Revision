@@ -11,7 +11,6 @@ import { TypeEnum } from "../utils/TypeEnum.js"
 
 
 const getAllComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
     const { id , type } = req.params;
     
     if (!TypeEnum.includes(type)) {
@@ -26,131 +25,102 @@ const getAllComments = asyncHandler(async (req, res) => {
         [
             {
                 $match: {
-                  [type]: new mongoose.Types.ObjectId(id)
+                [type]: new mongoose.Types.ObjectId(id)
                 }
             },
             {
-                $lookup : {
-                    from : "users",
-                    localField : "owner",
-                    foreignField : "_id",
-                    as : "ownerName"
+                $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'result'
                 }
             },
             {
-                $unwind: "$ownerName" 
+                $unwind: {
+                path: "$repliedComment",
+                preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                from: 'users',
+                localField: 'repliedComment.commentBy',
+                foreignField: '_id',
+                as: 'repliedComment.ownerDetails'
+                }
+            },
+            {
+                $unwind: {
+                path: "$repliedComment.ownerDetails",
+                preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                _id: "$_id",
+                content: { $first: "$content" },
+                owner: { $first: "$owner" },
+                comment: { $first: "$comment" },
+                [type]: { $first: `$${type}` }, // Dynamically project the field based on [type]
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                __v: { $first: "$__v" },
+                ownerName: { $first: { $arrayElemAt: ["$result.fullName", 0] } },
+                ownerAvatar: { $first: { $arrayElemAt: ["$result.avatar", 0] } },
+                ownerUserName: { $first: { $arrayElemAt: ["$result.username", 0] } },
+                repliedComments: { 
+                    $push: { 
+                    _id: "$repliedComment._id",
+                    commentBy: "$repliedComment.commentBy",
+                    commentText: "$repliedComment.content",
+                    createdAt: "$repliedComment.createdAt",
+                    updatedAt: "$repliedComment.updatedAt",
+                    ownerDetails: {
+                        _id: "$repliedComment.ownerDetails._id",
+                        fullName: "$repliedComment.ownerDetails.fullName",
+                        avatar: "$repliedComment.ownerDetails.avatar",
+                        // username: "$repliedComment.ownerDetails.username"
+                        username: {
+                            $cond: {
+                                if: { $eq: ["$repliedComment.ownerDetails", []] }, // Check if ownerDetails array is empty
+                                then: "$ownerUserName", // If empty, keep the username as is
+                                else: { $concat: ["@", "$repliedComment.ownerDetails.username"] } // If not empty, add "@" before username
+                            }
+                        }
+
+                    }
+                    }
+                }
+                }
             },
             {
                 $project: {
-                    
-                  _id: 1, 
-                  content: 1,
-                  video: 1,
-                  owner: 1,
-                  repliedComment : 1,
-                  ownerName: "$ownerName.fullName",
-                  ownerAvatar: "$ownerName.avatar",
-                  ownerUserName: "$ownerName.username",
-                  createdAt: 1,
-                  updatedAt: 1,
-                  
+                _id: 1,
+                content: 1,
+                video: 1,
+                owner: 1,
+                comment: 1,
+                repliedComment: {
+                    $cond: { if: { $eq: ["$repliedComments", [{}]] }, then: [], else: "$repliedComments" }
+                },
+                createdAt: 1,
+                updatedAt: 1,
+                ownerName: 1,
+                ownerAvatar: 1,
+                ownerUserName: 1,
+                __v: 1,
+                [type]: 1 // Dynamically project the field based on [type]
+
                 }
             },
             {
-              $skip: (page - 1) * limit
+                $skip: (page - 1) * limit
             },
             {
-              $limit: limit
+                $limit: limit
             }
-          ]
-        // [
-        //     {
-        //       $match: {
-        //         comment: new mongoose.Types.ObjectId(id)
-        //       }
-        //     },
-        //     {
-        //       $lookup: {
-        //         from: 'users',
-        //         localField: 'owner',
-        //         foreignField: '_id',
-        //         as: 'result'
-        //       }
-        //     },
-        //     {
-        //       $unwind: {
-        //         path: "$repliedComment",
-        //         preserveNullAndEmptyArrays: true
-        //       }
-        //     },
-        //     {
-        //       $lookup: {
-        //         from: 'users',
-        //         localField: 'repliedComment.commentBy',
-        //         foreignField: '_id',
-        //         as: 'repliedComment.ownerDetails'
-        //       }
-        //     },
-        //     {
-        //       $unwind: {
-        //         path: "$repliedComment.ownerDetails",
-        //         preserveNullAndEmptyArrays: true
-        //       }
-        //     },
-        //     {
-        //       $group: {
-        //         _id: "$_id",
-        //         content: { $first: "$content" },
-        //         owner: { $first: "$owner" },
-        //         comment: { $first: "$comment" },
-        //         createdAt: { $first: "$createdAt" },
-        //         updatedAt: { $first: "$updatedAt" },
-        //         __v: { $first: "$__v" },
-        //         ownerName: { $first: { $arrayElemAt: ["$result.fullName", 0] } },
-        //         ownerAvatar: { $first: { $arrayElemAt: ["$result.avatar", 0] } },
-        //         ownerUserName: { $first: { $arrayElemAt: ["$result.username", 0] } },
-        //         repliedComments: { 
-        //           $push: { 
-        //             _id: "$repliedComment._id",
-        //             commentBy: "$repliedComment.commentBy",
-        //             commentText: "$repliedComment.content",
-        //             createdAt: "$repliedComment.createdAt",
-        //             updatedAt: "$repliedComment.updatedAt",
-        //             ownerDetails: {
-        //               _id: "$repliedComment.ownerDetails._id",
-        //               fullName: "$repliedComment.ownerDetails.fullName",
-        //               avatar: "$repliedComment.ownerDetails.avatar",
-        //               username: "$repliedComment.ownerDetails.username"
-        //             }
-        //           }
-        //         }
-        //       }
-        //     },
-        //     {
-        //       $project: {
-        //         _id: 1,
-        //         content: 1,
-        //         owner: 1,
-        //         comment: 1,
-        //         repliedComment: {
-        //           $cond: { if: { $eq: ["$repliedComments", [{}]] }, then: [], else: "$repliedComments" }
-        //         },
-        //         createdAt: 1,
-        //         updatedAt: 1,
-        //         ownerName: 1,
-        //         ownerAvatar: 1,
-        //         ownerUserName: 1,
-        //         __v: 1
-        //       }
-        //     },
-        //     {
-        //       $skip: (page - 1) * limit
-        //     },
-        //     {
-        //       $limit: limit
-        //     }
-        //   ]
-          
+        ]   
     )
     
     return res.status(200).json(
@@ -159,7 +129,6 @@ const getAllComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
 
     const { content } = req.body;
     const { id , type } = req.params;
@@ -193,7 +162,6 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
     const { commentId } = req.params
     const { content } = req.body;
     if(! content) {
@@ -219,7 +187,6 @@ const updateComment = asyncHandler(async (req, res) => {
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
 
     const { commentId } = req.params
     await Comment.findByIdAndDelete(commentId)

@@ -18,6 +18,10 @@ const likeSchema = new Schema(
         tweet : {
             type : Schema.Types.ObjectId,
             ref : "Tweet"
+        },
+        repliedComment : {
+            type : Schema.Types.ObjectId,
+            ref : "Comment"
         }
     },
     {

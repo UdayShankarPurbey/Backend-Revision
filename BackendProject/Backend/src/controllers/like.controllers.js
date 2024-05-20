@@ -61,6 +61,32 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
         new ApiResponse ( 200 , comment , message)
     )
 })
+const toggleRepliedCommentLike = asyncHandler(async (req, res) => {
+    const {  repliedId } = req.params;
+
+    const togglerepliedComment = await Like.find(
+        {
+            $and : [{LikedBy : req.user?._id},{repliedComment : repliedId}]
+        }
+    )
+
+    let message;
+    let repliedComment;
+    console.log(togglerepliedComment);
+    if (togglerepliedComment.length > 0) {
+        repliedComment = await Like.findByIdAndDelete(togglerepliedComment[0]?._id);
+        message = "Liked replied comment deleted successfully";
+    } else {
+        repliedComment = await Like.create({
+            LikedBy : req.user?._id,
+            repliedComment : repliedId,
+        });
+        message = "Liked replied comment created successfully";
+    }
+
+    // Return the response
+    return res.status(200).json(new ApiResponse(200, repliedComment, message));
+});
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
@@ -112,9 +138,30 @@ const getLikedData= asyncHandler(async (req, res) => {
 
 })
 
+const getRepliedLikeData =  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const like = await Like.aggregate(
+        [
+            {
+                $match: {
+                 $and : [{LikedBy : req.user?._id},{repliedComment: new mongoose.Types.ObjectId(id)}]
+                }
+            }
+          ]
+    )
+
+    return res.status(200).json(
+        new ApiResponse(200, like, "Replied Like Fetch Successfully")
+    );
+
+})
+
 export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
+    toggleRepliedCommentLike,
+    getRepliedLikeData,
     getLikedData
 }
