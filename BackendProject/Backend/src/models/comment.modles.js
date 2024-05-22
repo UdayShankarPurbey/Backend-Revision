@@ -1,6 +1,22 @@
 import mongoose ,{Schema} from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
+const repliedSchema = new Schema(
+    {
+        content : {
+            type : String,
+            required : true
+        },
+        commentBy : {
+            type : Schema.Types.ObjectId,
+            ref : "User"
+        },
+    },
+    {
+        timestamps: true,
+    }
+)
+
 const commentSchema = new Schema(
     {
         content : {
@@ -24,28 +40,7 @@ const commentSchema = new Schema(
             ref : "Tweet"
         },
         repliedComment : [
-          {
-            content : {
-                type : String,
-                required : true
-            },
-            commentBy : {
-                type : Schema.Types.ObjectId,
-                ref : "User"
-            },
-            // userName : {
-            //     type : String,
-            //     required : true,
-            //     // Custom setter function to add '@' at the beginning
-            //     set: function(value) {
-            //         // Check if value is provided and doesn't already start with '@'
-            //         if (value && !value.startsWith('@')) {
-            //             return '@' + value; // Add '@' at the beginning
-            //         }
-            //         return value;
-            //     }
-            // }
-          }
+          repliedSchema
         ]
     },
     {

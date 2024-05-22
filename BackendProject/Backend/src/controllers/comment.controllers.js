@@ -216,10 +216,57 @@ const addRepliedComment = asyncHandler(async (req, res) => {
     .json(new ApiResponse( 200 , comment , "Replied comment Successfully" ))    
 })
 
+const editRepliedComment = asyncHandler(async (req, res) => {
+    const { commentId, repliedCommentId } = req.params;
+    const { content } = req.body;
+
+    const comment = await Comment.findById(repliedCommentId);
+
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    const repliedComment = comment.repliedComment.id(commentId);
+    if (!repliedComment) {
+        throw new ApiError(404, "Replied comment not found");
+    }
+
+    repliedComment.content = content;
+
+    await comment.save();
+
+    return res.status(200)
+        .json(new ApiResponse(200, repliedComment, "Replied comment edited successfully"));
+});
+
+const deleteRepliedComment = asyncHandler(async (req, res) => {
+    const { commentId, repliedCommentId } = req.params;
+
+    const comment = await Comment.findById(repliedCommentId);
+
+    if (!comment) {
+        throw new ApiError(404, "Comment not found");
+    }
+
+    const repliedComment = comment.repliedComment.id(commentId);
+    if (!repliedComment) {
+        throw new ApiError(404, "Replied comment not found");
+    }
+
+    comment.repliedComment.pull(commentId);
+
+    await comment.save();
+
+    return res.status(200)
+        .json(new ApiResponse(200, repliedCommentId, "Replied comment deleted successfully"));
+});
+
 export {
     getAllComments, 
     addComment, 
     updateComment,
     deleteComment,
     addRepliedComment,
+    editRepliedComment,
+    deleteRepliedComment,
     }
