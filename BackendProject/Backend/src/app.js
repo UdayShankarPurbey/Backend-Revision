@@ -1,6 +1,7 @@
 import expres from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 
 const app = expres();
 
@@ -13,6 +14,7 @@ app.use(expres.json({limit : '50kb'}))
 app.use(expres.urlencoded({extended : true , limit : '50kb'}))
 app.use(expres.static("public"))
 app.use(cookieParser())
+app.use(morgan('dev'))
 
 //routes 
 
